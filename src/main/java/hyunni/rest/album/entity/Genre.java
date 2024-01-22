@@ -16,4 +16,26 @@ public class Genre {
 
     @Column(name = "genre_name")
     private String genreName;
+
+    public Genre updateGenreCode(Long newGenreCode) {
+        return new Genre(newGenreCode, this.genreName);
+    }
+    public Genre(Long genreCode, String genreName) {
+        this.genreCode = genreCode;
+        this.genreName = genreName;
+    }
+
+    public Genre genreCode(Long genreCode) {
+        this.genreCode = genreCode;
+        return this;
+    }
+
+    public Genre genreName(String genreName) {
+        this.genreName = genreName;
+        return this;
+    }
+
+    public void setGenreCode(Long genreCode) {
+        this.genreCode = genreCode;
+    }
 }

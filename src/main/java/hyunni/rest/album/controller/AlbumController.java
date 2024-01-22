@@ -30,6 +30,7 @@ import java.util.Map;
 public class AlbumController {
 
     private AlbumService albumService;
+
     @Autowired
     public AlbumController(AlbumService albumService) {
         this.albumService = albumService;
@@ -51,33 +52,40 @@ public class AlbumController {
 
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
         } else {
-            ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.BAD_REQUEST, "get All albums = failed...", responseMap);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.BAD_REQUEST);
+            log.info("Did Search value (status) come through? : " + status);
+            List<CombinedAlbumDTO> searchResult = albumService.findReviewsBySearchFilter(status);
+
+            responseMap.put("albumList", searchResult);
+            ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.OK, "get search result = success!", responseMap);
+            System.out.println("search Result : " + responseMap);
+
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
         }
     }
 
+
     @ApiOperation(value = "viewSpecificAlbum", notes = "View by album code", tags = {"viewSpecificAlbum"})
     @GetMapping("{albumCode}")
-    public ResponseEntity<ResponseMessageDTO> getSpecificAlbum(@PathVariable int albumCode) throws IllegalAccessException {
+    public ResponseEntity<ResponseMessageDTO> getSpecificAlbum(@PathVariable Long albumCode) throws IllegalAccessException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         Map<String, Object> responseMap = new HashMap<>();
 
-            CombinedAlbumDTO album = albumService.findAlbumDetails(albumCode);
-            responseMap.put("album", album);
-            ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.OK, "get album details = success!", responseMap);
-            System.out.println("album Details brought : " + responseMap);
+        CombinedAlbumDTO album = albumService.findAlbumDetails(albumCode);
+        responseMap.put("album", album);
+        ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.OK, "get album details = success!", responseMap);
+        System.out.println("album Details brought : " + responseMap);
 
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
     @ApiOperation(value = "postAlbum", notes = "Regist new album", tags = {"postAlbum"})
     @PostMapping()
     public ResponseEntity<?> postAlbum(@ModelAttribute AlbumDTO albumDTO,
-                                                        @ModelAttribute ArtistDTO artistDTO,
-                                                        //@RequestParam (name = "artistName") String artistName,
-                                                        MultipartFile imageFile) throws IOException {
+                                       @ModelAttribute ArtistDTO artistDTO,
+                                       //@RequestParam (name = "artistName") String artistName,
+                                       MultipartFile imageFile) throws IOException {
         log.info("(Album Controller) RegistAlbum : " + albumDTO);
         log.info("(Album Controller) RegistAlbum : " + artistDTO);
         log.info("(Album Controller) RegistAlbum Image : " + imageFile);
@@ -87,11 +95,46 @@ public class AlbumController {
 
         albumService.postAlbum(albumDTO, imageFile, artistDTO);
 
-        return new ResponseEntity<>("new Album register success!",headers, HttpStatus.OK);
+        return new ResponseEntity<>("new Album register success!", headers, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "putAlbum", notes = "modify album", tags = {"putAlbum"})
+    @PutMapping()
+    public ResponseEntity<?> putAlbum(@ModelAttribute AlbumDTO albumDTO,
+                                      @ModelAttribute GenreDTO genreDTO,
+                                      MultipartFile imageFile) throws IOException {
+        log.info("(Album Controller) ModifyAlbum : " + albumDTO);
+        log.info("(Album Controller) ModifyAlbum : " + imageFile);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
+        albumService.putAlbum(albumDTO, genreDTO, imageFile);
+
+        return new ResponseEntity<>("album modify success!", headers, HttpStatus.OK);
 
     }
+
+    @ApiOperation(value = "deleteAlbum", notes = "delete album by albumCode", tags = {"deleteALbum"})
+    @DeleteMapping("{albumCode}")
+    public ResponseEntity<ResponseMessageDTO> deleteAlbum(@PathVariable Long albumCode) {
+        log.info("(Album Controller) DeleteAlbum : " + albumCode);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        Map<String, Object> responseMap = new HashMap<>();
+
+        boolean deleteAlbum = albumService.deleteAlbum(albumCode);
+        log.info("done?: " + deleteAlbum);
+
+        if (deleteAlbum) {
+            ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.OK, "album deletion success!", responseMap);
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+        } else {
+            ResponseMessageDTO responseMessage = new ResponseMessageDTO(HttpStatus.BAD_GATEWAY, "album deletion failed!", responseMap);
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.BAD_GATEWAY);
+        }
+    }
+
+}
 
