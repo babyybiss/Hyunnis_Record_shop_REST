@@ -34,4 +34,15 @@ public class AlbumFile {
     @JoinColumn(name = "album_code", referencedColumnName = "album_code")
     private Album album;
 
+    public AlbumFile(String fileSaveName){}
+
+    public AlbumFile fileSaveName(String fileSaveName) {
+        this.fileSaveName = fileSaveName;
+        return this;
+    }
+
+    public AlbumFile build() {
+        return new AlbumFile(fileSaveName);
+    }
+
 }

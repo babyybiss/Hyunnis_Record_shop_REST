@@ -19,6 +19,9 @@ public class ResponseMessageDTO {
         this.results = results;
     }
 
+
+
+
     public int getHttpStatusCode() {
         return httpStatusCode;
     }

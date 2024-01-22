@@ -40,6 +40,43 @@ public class Album {
     @OneToOne(mappedBy = "album", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private AlbumFile albumFile;
 
+    public Album(Long albumCode, String title, Date releaseDate, Long albumPrice, Genre genre) {
+    }
+
+    public Album albumCode(Long albumCode) {
+        this.albumCode = albumCode;
+        return this;
+    }
+
+    public Album title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Album albumPrice(Long albumPrice) {
+        this.albumPrice = albumPrice;
+        return this;
+    }
+
+    public Album releaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+        return this;
+    }
+
+    public Album genre(Genre genre) {
+        this.genre = genre;
+        return this;
+    }
+    
+    public Album artist(Artist artist) {
+        this.artist = artist;
+        return this;
+    }
+
+
+    public Album build() {
+        return new Album(albumCode,title, releaseDate,albumPrice, genre);
+    }
 
 }
 
