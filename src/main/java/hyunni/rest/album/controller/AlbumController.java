@@ -37,7 +37,7 @@ public class AlbumController {
     }
 
     @ApiOperation(value = "viewAllAlbums", notes = "View by Artist Name or by recently added albums", tags = {"viewAllAlbums"})
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<ResponseMessageDTO> main(@RequestParam(required = false) String status) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
